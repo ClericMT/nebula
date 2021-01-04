@@ -18,8 +18,8 @@ let l = []
 //map mouse coordinates on click
 canvas.onclick = function(e) {
     let rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = e.pageX - rect.left;
+    const y = e.pageY - rect.top;
     evaluate(x,y);
     console.log(n)
     draw();
