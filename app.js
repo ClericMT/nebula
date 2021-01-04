@@ -4,7 +4,7 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
 //constants
-const initRadius = 10
+const initRadius = 8
 const inactiveColour = '#6495ED'
 const activeColour = '#CCCCFF'
 const logHoursColour = '#40E0D0'
