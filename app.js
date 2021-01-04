@@ -4,10 +4,12 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
 //constants
-const initRadius = 20
-const inactiveColour = 'blue'
-const activeColour = 'aqua'
-const logHoursColour = 'green'
+const initRadius = 10
+const inactiveColour = '#6495ED'
+const activeColour = '#CCCCFF'
+const logHoursColour = '#40E0D0'
+const lineColourOff = '#6495ED'
+const lineColourOn = '#CCCCFF'
 
 //nodes and lines
 let n = []
@@ -26,14 +28,13 @@ function updateLines(){
     let i = 0;
     let j = 0;
     let h = 0;
-    let k = 0
+    let k = 0;
     for (i = 0; i < n.length; i ++){
         for (j = 0; j < n.length; j ++){
             for (h = 0; h < n[i].ins.length; h ++){
                 for (k = 0; k < n[j].outs.length; k ++){
                     if (n[i].ins[h] == n[j].id && n[j].outs[k] == n[i].id && n[i].id !== n[j].id){
-                        l.push({x1: n[i].x, y1: n[i].y, x2: n[j].x, y2: n[j].y})
-                        console.log(l)
+                        l.push({x1: n[i].x, y1: n[i].y, x2: n[j].x, y2: n[j].y, colour: lineColourOff})
                     }
                 }
             }
@@ -43,8 +44,17 @@ function updateLines(){
 
 //turns node on, off
 function nodeOn(index){
+    let i = 0;
     n[index].io = true;
     n[index].colour = activeColour;
+    if (typeof l[0] !== 'undefined'){
+        console.log(l[0])
+        for (i = 0; i < l.length; i++){
+            if (n[index].x == l[i].x1){
+                l[i].colour = lineColourOn
+            }
+        }
+    }
 }
 
 function nodeOff(index){
@@ -110,7 +120,7 @@ function draw() {
         ctx.beginPath();
         ctx.moveTo(l[j].x1, l[j].y1);
         ctx.lineTo(l[j].x2, l[j].y2);
-        ctx.strokeStyle = 'blue';
+        ctx.strokeStyle = l[j].colour;
         ctx.stroke();
     }
     for (i = 0; i < n.length; i++){
