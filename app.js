@@ -1,7 +1,7 @@
 //create canvas
 const canvas = document.getElementById('canvas')
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 //constants
 const initRadius = 8
@@ -17,8 +17,9 @@ let l = []
 
 //map mouse coordinates on click
 canvas.onclick = function(e) {
-    const x = e.pageX;
-    const y = e.pageY;
+    let rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     evaluate(x,y);
     console.log(n)
     draw();
@@ -110,12 +111,13 @@ function evaluate(x, y){
     }
 }
 
-//draws node
+//draws nodes and lines
 function draw() {
     updateLines()
     const ctx = canvas.getContext('2d');
     let i = 0;
     let j = 0;
+    //lines
     for (j = 0; j < l.length; j++){
         ctx.beginPath();
         ctx.moveTo(l[j].x1, l[j].y1);
@@ -123,6 +125,7 @@ function draw() {
         ctx.strokeStyle = l[j].colour;
         ctx.stroke();
     }
+    //nodes
     for (i = 0; i < n.length; i++){
         ctx.beginPath();
         ctx.arc(n[i].x, n[i].y, n[i].radius, 0, 2 * Math.PI, false);
