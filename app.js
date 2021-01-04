@@ -4,12 +4,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 //constants
-const initRadius = 8
-const inactiveColour = '#6495ED'
-const activeColour = '#CCCCFF'
+const initRadius = 20
+const inactiveColour = '#0000FF'
+const activeColour = '#33FFFF'
 const logHoursColour = '#40E0D0'
-const lineColourOff = '#6495ED'
-const lineColourOn = '#CCCCFF'
+const lineColourOff = '#0000FF'
+const lineColourOn = '#33FFFF'
 
 //nodes and lines
 let n = []
