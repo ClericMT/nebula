@@ -16,12 +16,11 @@ let n = []
 let l = []
 
 //map mouse coordinates on click
-canvas.onclick = function(e) {
+canvas.onmousedown = function(e) {
     let rect = canvas.getBoundingClientRect();
-    const x = e.pageX - 8;
-    const y = e.pageY - 26.399999618530273;
-    evaluate(x,y);
-    console.log(n)
+    const x = e.pageX - rect.left;
+    const y = e.pageY - rect.top;
+    nodeClicked(x,y);
     draw();
 }
 
@@ -49,7 +48,6 @@ function nodeOn(index){
     n[index].io = true;
     n[index].colour = activeColour;
     if (typeof l[0] !== 'undefined'){
-        console.log(l[0])
         for (i = 0; i < l.length; i++){
             if (n[index].x == l[i].x1){
                 l[i].colour = lineColourOn
@@ -76,7 +74,7 @@ function nodeCreate(x, y){
     n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: nodeIns, outs: []});
 }
 
-function evaluate(x, y){
+function nodeClicked(x, y){
     //do any nodes exist? create one : check clicked node's status
     typeof n[0] !== 'undefined' ? check(x, y) : n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: [], outs: []})
 
@@ -85,7 +83,7 @@ function evaluate(x, y){
         let i = 0
         for (i = 0; i < n.length; i++){
             //determines if node has been clicked
-            function clickedNode() {
+            function isNodeClicked() {
                 let minX = (n[i].x - n[i].radius);
                 let maxX = (n[i].x + n[i].radius);
                 let minY = (n[i].y - n[i].radius);
@@ -95,13 +93,13 @@ function evaluate(x, y){
                 } else {return false}
             }
             //checks if node is on, off or doesn't exist at click coordinates
-            if (clickedNode() && n[i].io == false){
+            if (isNodeClicked() && n[i].io == false){
                 nodeOn(i);
                 break;
-            } else if (clickedNode() && n[i].io == true) {
+            } else if (isNodeClicked() && n[i].io == true) {
                 nodeOff(i);
                 break;
-            } else if (clickedNode()) {
+            } else if (isNodeClicked()) {
                 break;
             } else if (i == n.length - 1){
                 nodeCreate(x, y);
