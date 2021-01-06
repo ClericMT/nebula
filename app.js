@@ -4,7 +4,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 //constants
-const initRadius = 20
+const initRadius = 15
 const inactiveColour = '#0000FF'
 const activeColour = '#33FFFF'
 const logHoursColour = '#40E0D0'
@@ -17,10 +17,14 @@ let l = []
 
 //map mouse coordinates on click
 canvas.onmousedown = function(e) {
+    let ctrl = false
+    if (e.ctrlKey){
+        ctrl = true
+    }
     let rect = canvas.getBoundingClientRect();
     const x = e.pageX - rect.left;
     const y = e.pageY - rect.top;
-    nodeClicked(x,y);
+    nodeClicked(x, y, ctrl);
     draw();
 }
 
@@ -67,14 +71,25 @@ function nodeCreate(x, y){
     let nodeIns = []
     for (i = 0; i < n.length; i++){
         if (n[i].io == true){
-            nodeIns.push(n[i].id)
-            n[i].outs.push(n.length)
+            nodeIns.push(n[i].id) //ins for new node
+            n[i].outs.push(n.length) //outs for active nodes
         }
     }
     n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: nodeIns, outs: []});
 }
 
-function nodeClicked(x, y){
+//connects active nodes to ctrl-clicked node
+function nodeConnect(index){
+    let i = 0;
+    for (i = 0; i < n.length; i++){
+        if (n[i].io == true){
+            n[i].ins.push(n[index].id)
+            n[index].outs.push(n[i].id)
+        }
+    }
+}
+
+function nodeClicked(x, y, ctrl){
     //do any nodes exist? create one : check clicked node's status
     typeof n[0] !== 'undefined' ? check(x, y) : n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: [], outs: []})
 
@@ -92,8 +107,13 @@ function nodeClicked(x, y){
                     return true;
                 } else {return false}
             }
-            //checks if node is on, off or doesn't exist at click coordinates
-            if (isNodeClicked() && n[i].io == false){
+            //determines next action
+            if (isNodeClicked() && n[i].io == false && ctrl == true){
+                nodeConnect(i)
+                nodeOn(i)
+                break;
+            }
+            else if (isNodeClicked() && n[i].io == false){
                 nodeOn(i);
                 break;
             } else if (isNodeClicked() && n[i].io == true) {
@@ -111,6 +131,7 @@ function nodeClicked(x, y){
 
 //draws nodes and lines
 function draw() {
+    console.log(n.length)
     updateLines()
     const ctx = canvas.getContext('2d');
     let i = 0;
