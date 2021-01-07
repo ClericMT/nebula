@@ -5,45 +5,28 @@ canvas.height = window.innerHeight;
 
 //constants
 const initRadius = 15
-const inactiveColour = '#0000FF'
-const activeColour = '#33FFFF'
-const logHoursColour = '#40E0D0'
-const lineColourOff = '#0000FF'
-const lineColourOn = '#33FFFF'
+
+//colour codes
+const inactiveColour = '#0000FF', activeColour = '#33FFFF', logHoursColour = '#40E0D0', lineColourOff = '#0000FF', lineColourOn = '#33FFFF'
 
 //nodes and lines
 let n = []
 let l = []
 
 //map mouse coordinates on click
-canvas.onmousedown = function(e) {
-    let ctrl = false
+canvas.onmousedown = function(e) { //Surely i can compile this better???
+    let ctrl = false, alt = false
     if (e.ctrlKey){
-        ctrl = true
+        ctrl = true;
+    }
+    if (e.altKey){
+        alt = true;
     }
     let rect = canvas.getBoundingClientRect();
     const x = e.pageX - rect.left;
     const y = e.pageY - rect.top;
-    nodeClicked(x, y, ctrl);
+    nodeClicked(x, y, ctrl, alt);
     draw();
-}
-
-function updateLines(){
-    let i = 0;
-    let j = 0;
-    let h = 0;
-    let k = 0;
-    for (i = 0; i < n.length; i ++){
-        for (j = 0; j < n.length; j ++){
-            for (h = 0; h < n[i].ins.length; h ++){
-                for (k = 0; k < n[j].outs.length; k ++){
-                    if (n[i].ins[h] == n[j].id && n[j].outs[k] == n[i].id && n[i].id !== n[j].id){
-                        l.push({x1: n[i].x, y1: n[i].y, x2: n[j].x, y2: n[j].y, colour: lineColourOff})
-                    }
-                }
-            }
-        }
-    }
 }
 
 //turns node on, off
@@ -65,17 +48,19 @@ function nodeOff(index){
     n[index].colour = inactiveColour;
 }
 
-//creates new node and appends ins/outs with other nodes
+//creates new node and appends connections/connections with other nodes
 function nodeCreate(x, y){
     let i = 0
-    let nodeIns = []
+    let connections = []
     for (i = 0; i < n.length; i++){
-        if (n[i].io == true){
-            nodeIns.push(n[i].id) //ins for new node
-            n[i].outs.push(n.length) //outs for active nodes
+        if (n[i].io){
+            connections.push(n[i].id) //connections for new node
+            n[i].connections.push(n.length) //connections for active nodes
+            l.push({x1: n[i].x, y1: n[i].y, x2: x, y2: y, colour: lineColourOff})
         }
     }
-    n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: nodeIns, outs: []});
+    n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, connections: connections});
+
 }
 
 //connects active nodes to ctrl-clicked node
@@ -83,15 +68,29 @@ function nodeConnect(index){
     let i = 0;
     for (i = 0; i < n.length; i++){
         if (n[i].io == true){
-            n[i].ins.push(n[index].id)
-            n[index].outs.push(n[i].id)
+            n[i].connections.push(n[index].id)
+            n[index].connections.push(n[i].id)
         }
     }
 }
 
-function nodeClicked(x, y, ctrl){
+//Need to fix line deletion and repeat of lines
+function nodeDelete(index){
+    n.splice(index,index)
+    let i = 0;
+    let j = 0;
+    for (i = 0; i < n.length; i++){
+        for (j = 0; j < l.length; j++){
+            if (n[i].x == l[j].x1 || n[i].x == l[j].x2){
+                l.splice(j,j)
+            }
+        }
+    }
+}
+
+function nodeClicked(x, y, ctrl, alt){
     //do any nodes exist? create one : check clicked node's status
-    typeof n[0] !== 'undefined' ? check(x, y) : n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, ins: [], outs: []})
+    typeof n[0] !== 'undefined' ? check(x, y) : n.push({id: n.length, io: false, x: x, y: y, radius: initRadius, colour: inactiveColour, logger: false, connections: []})
 
     //clicks on node
     function check(x, y) {
@@ -107,20 +106,29 @@ function nodeClicked(x, y, ctrl){
                     return true;
                 } else {return false}
             }
-            //determines next action
+            //ACTIONS
+            //Connect
             if (isNodeClicked() && n[i].io == false && ctrl == true){
-                nodeConnect(i)
-                nodeOn(i)
-                break;
-            }
-            else if (isNodeClicked() && n[i].io == false){
+                nodeConnect(i);
                 nodeOn(i);
                 break;
+            }
+            //Delete
+            else if (isNodeClicked() && alt == true){
+                nodeDelete(i);
+                break;
+            //Activate
+            } else if (isNodeClicked() && n[i].io == false){
+                nodeOn(i);
+                break;
+            //Deactivate
             } else if (isNodeClicked() && n[i].io == true) {
                 nodeOff(i);
                 break;
+            //Continue iteration
             } else if (isNodeClicked()) {
                 break;
+            //Create node if none detected at click.coords
             } else if (i == n.length - 1){
                 nodeCreate(x, y);
                 break;
@@ -131,9 +139,9 @@ function nodeClicked(x, y, ctrl){
 
 //draws nodes and lines
 function draw() {
-    console.log(n.length)
-    updateLines()
+    console.log(l)
     const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,2000,2000)
     let i = 0;
     let j = 0;
     //lines
