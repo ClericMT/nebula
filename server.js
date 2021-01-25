@@ -4,14 +4,16 @@ const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectID } = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
-
+const port = 3000;
 //MongoDB connection string
 const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
 
 //Check if server's connected
+/*
 app.listen(3000, function() {
     console.log('listening on 3000')
   })
+  */
 
 //connect to my dataBase
 MongoClient.connect(connectionString, { useUnifiedTopology: true })
@@ -91,6 +93,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         })
         .catch(error => console.error(error))
     })
+
+    app.listen(port, () => console.log(`Example app listening on port ${port}!`))
     
     /*
     app.delete('/nodes', (req, res) => {
