@@ -1,118 +1,50 @@
-const express = require('express');
+
+
+
+// create an express app
+const express = require("express");
 const app = express();
+
 const bodyParser = require('body-parser')
-const MongoClient = require('mongodb').MongoClient;
 const { ObjectID } = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
 const port = 3000;
-//MongoDB connection string
-//'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
-const connectionString = process.env.MONGODB_URI
-const uri = process.env.MONGODB_URI;
 
-//Check if server's connected
-/*
-app.listen(3000, function() {
-    console.log('listening on 3000')
-  })
-  */
+const { MongoClient } = require("mongodb");
 
-//connect to my dataBase
-MongoClient.connect(connectionString, { useUnifiedTopology: true })
-  .then(client => {
-    console.log('Connected to Database')
-    const db = client.db('node-db')
-    const nodeCollection = db.collection('nodes')
+const uri = "mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
+// use the express-static middleware
+app.use(express.static("public"));
 
-    //
-    // Middlewares
-    //
-    app.set('view engine', 'ejs') //sets EJS as template engine
-    app.use(bodyParser.urlencoded({ extended: true }))  // Make sure you place body-parser before your CRUD handlers!
-    app.use(bodyParser.json()) //So server can read JSON
-    app.use(express.static('public')) //This allows server to serve files in public folder
+// define the first route
+app.get("/", async function (req, res) {
+  const client = new MongoClient(uri, { useUnifiedTopology: true });
+  
+  try {
+    await client.connect();
 
-    //
-    // Routes
-    //
+    const database = client.db('node-db');
+    const collection = database.collection('nodes');
 
+    // Query for a movie that has the title 'Back to the Future'
+    const query = { name: 'Jesse' };
+    const cursor = await collection.aggregate([
+      { $match: query },
+      { $sample: { size: 1 } },
+    ]);
 
-    
-    app.get('/nodes', (req, res) => {
-      db.collection('nodes').find().toArray()
-        .then(results => {
-          res.send({ nodes: results }) //renders results (also add <%= nodes %> to index.ejs)
-        })
+    const movie = await cursor.next();
 
-        .catch(error => console.error(error))
-    })
-    
-    
-    app.get('/', (req, res) => {
-      db.collection('nodes').find().toArray()
-        .then(results => {
-          res.render('index.ejs', { nodes: results }) //renders results (also add <%= nodes %> to index.ejs)
-        })
-        .catch(error => console.error(error))
-    })
+    return res.json(movie);
+  } catch(err) {
+    console.log(err);
+  }
+  finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+});
 
-    app.post('/nodes', (req, res) => {
-        nodeCollection.insertOne(req.body)
-          .then(result => {
-            console.log(req.body._id)
-            res.redirect('/')
-          })
-          .catch(error => console.error(error))
-      })
-
-    app.put('/nodes', (req, res) => {
-      nodeCollection.updateOne({_id: ObjectID(req.body.id)},
-      { 
-        $set: {
-          x: req.body.x,
-          y: req.body.y,
-          time: req.body.time,
-          name: req.body.name,
-          text: req.body.text
-        }
-      })
-      .then(result => {
-        res.json('Success')
-      })
-      .catch(error => console.error(error))
-    })
-    
-    
-    app.delete('/nodes', (req, res) => {
-      nodeCollection.deleteOne(
-        { _id: ObjectId(req.body.id) }
-      )
-        .then(result => {
-          if (result.deletedCount === 0) {
-            return res.json('No nodes to delete')
-          }
-          res.json(`Deleted node`)
-        })
-        .catch(error => console.error(error))
-    })
-
-    app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-    
-    /*
-    app.delete('/nodes', (req, res) => {
-      nodeCollection.deleteMany(
-        { }
-      )
-        .then(result => {
-          if (result.deletedCount === 0) {
-            return res.json('No nodes to delete')
-          }
-          res.json(`Deleted node`)
-        })
-        .catch(error => console.error(error))
-    })
-    */
-    
-    
-  })
-  .catch(console.error)
+// start the server listening for requests
+app.listen(process.env.PORT || 3000, 
+	() => console.log("Server is running..."));
