@@ -7,6 +7,7 @@ var ObjectId = require('mongodb').ObjectID;
 const port = 3000;
 //MongoDB connection string
 const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
+const uri = process.env.MONGODB_URI;
 
 //Check if server's connected
 /*
