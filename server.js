@@ -12,7 +12,7 @@ const port = 3000;
 const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
 const { MongoClient } = require("mongodb");
 
-const uri = [process.env.MONGODB_URI//"mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI//"mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
 // use the express-static middleware
 app.use(express.static("public"));
 
