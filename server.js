@@ -19,6 +19,11 @@ app.use(express.static("public"));
 // define the first route
 app.get("/", async function (req, res) {
   const client = new MongoClient(uri, { useUnifiedTopology: true });
+
+  app.set('view engine', 'ejs') //sets EJS as template engine
+  app.use(bodyParser.urlencoded({ extended: true }))  // Make sure you place body-parser before your CRUD handlers!
+  app.use(bodyParser.json()) //So server can read JSON
+  app.use(express.static('public')) //This allows server to serve files in public folder
   
   try {
     await client.connect();
@@ -33,9 +38,9 @@ app.get("/", async function (req, res) {
       { $sample: { size: 1 } },
     ]);
 
-    const movie = await cursor.next();
+    const node = await cursor.next();
 
-    return res.json(movie);
+    return res.render('index.ejs', { nodes: results })
   } catch(err) {
     console.log(err);
   }
