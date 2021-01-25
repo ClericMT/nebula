@@ -40,7 +40,8 @@ app.get("/", async function (req, res) {
 
     const node = await cursor.next();
 
-    return res.render('index.ejs', { nodes: results })
+    return res.json(node);
+
   } catch(err) {
     console.log(err);
   }
