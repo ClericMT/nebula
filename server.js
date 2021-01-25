@@ -31,17 +31,14 @@ app.get("/", async function (req, res) {
     const database = client.db('node-db');
     const collection = database.collection('nodes');
 
-    // Query for a movie that has the title 'Back to the Future'
-    const query = { name: 'Jesse' };
-    const cursor = await collection.aggregate([
-      { $match: query },
-      { $sample: { size: 1 } },
-    ]);
+    app.get('/nodes', (req, res) => {
+      db.collection('nodes').find().toArray()
+        .then(results => {
+          res.send({ nodes: results }) //renders results (also add <%= nodes %> to index.ejs)
+        })
 
-    const node = await cursor.next();
-
-    return res.json(node);
-
+        .catch(error => console.error(error))
+    })
   } catch(err) {
     console.log(err);
   }
