@@ -192,9 +192,9 @@ function readData(node){
         headers: { 'Content-Type': 'application/json' },
     })
     .then(res => {
-        if (res.ok) return res.json()
+        if (res.ok) return res.json() //if response ok convert response into json
     })
-    .then(data => {
+    .then(data => { //data is just the returned res.json() which is an array of nodes
         let d = data.nodes
         for(let i = 0; i < d.length; i++){
             addNode(d[i]._id, d[i].x, d[i].y, d[i].conns, d[i].time, d[i].name, d[i].text)

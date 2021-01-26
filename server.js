@@ -12,7 +12,7 @@ const port = 3000;
 const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
 const { MongoClient } = require("mongodb");
 
-const uri = process.env.MONGODB_URI//"mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
 // use the express-static middleware
 app.use(express.static("public"));
 
@@ -39,23 +39,21 @@ client.connect()
 
 
     
-    app.get('/nodes', (req, res) => {
-      db.collection('nodes').find().toArray()
+    app.get('/nodes', (req, res) => { //when req sent from nodes, returns response
+      db.collection('nodes').find().toArray() //each object in db to an array
         .then(results => {
-          res.send({ nodes: results }) //renders results (also add <%= nodes %> to index.ejs)
+          res.send({ nodes: results }) //sends array to client as "nodes"
         })
 
         .catch(error => console.error(error))
     })
     
     
-    app.get('/', (req, res) => {
-      db.collection('nodes').find().toArray()
-        .then(results => {
-          res.render('index.ejs', { nodes: results }) //renders results (also add <%= nodes %> to index.ejs)
-        })
-        .catch(error => console.error(error))
+    app.get('/', (req, res) => { //When the main page loads, the esj file will render
+        res.render('index.ejs') 
     })
+
+    /*
 
     app.post('/nodes', (req, res) => {
         nodeCollection.insertOne(req.body)
@@ -96,6 +94,7 @@ client.connect()
         })
         .catch(error => console.error(error))
     })
+    */
 
     app.listen(port, () => console.log(`Example app listening on port ${port}!`))
     
