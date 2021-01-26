@@ -1,6 +1,3 @@
-
-
-
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
@@ -8,12 +5,10 @@ const { ObjectID } = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
 const port = 5000;
 //MongoDB connection string
-//'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
-const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
+const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority' //for dev
 const { MongoClient } = require("mongodb");
 
 const uri = process.env.MONGODB_URI
-//"mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority";
 // use the express-static middleware
 app.use(express.static("public"));
 
@@ -38,8 +33,6 @@ client.connect()
     // Routes
     //
 
-
-    
     app.get('/nodes', (req, res) => { //when req sent from nodes, returns response
       db.collection('nodes').find().toArray() //each object in db to an array
         .then(results => {
@@ -49,12 +42,9 @@ client.connect()
         .catch(error => console.error(error))
     })
     
-    
     app.get('/', (req, res) => { //When the main page loads, the esj file will render
         res.render('index.ejs')
     })
-
-    /*
 
     app.post('/nodes', (req, res) => {
         nodeCollection.insertOne(req.body)
@@ -82,7 +72,6 @@ client.connect()
       .catch(error => console.error(error))
     })
     
-    
     app.delete('/nodes', (req, res) => {
       nodeCollection.deleteOne(
         { _id: ObjectId(req.body.id) }
@@ -95,7 +84,7 @@ client.connect()
         })
         .catch(error => console.error(error))
     })
-    */
+    
 
     app.listen(process.env.PORT || port, () => console.log(`Example app listening on port ${port}!`))
     
@@ -113,7 +102,6 @@ client.connect()
         .catch(error => console.error(error))
     })
     */
-    
     
   })
   .catch(console.error)
