@@ -6,7 +6,7 @@ const app = express();
 const bodyParser = require('body-parser')
 const { ObjectID } = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
-const port = 3000;
+const port = 5000;
 //MongoDB connection string
 //'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
 const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority'
