@@ -50,7 +50,7 @@ client.connect()
     
     
     app.get('/', (req, res) => { //When the main page loads, the esj file will render
-        res.render('index.ejs') 
+        res.render('index.ejs')
     })
 
     /*
