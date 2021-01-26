@@ -3,12 +3,12 @@ const app = express();
 const bodyParser = require('body-parser')
 const { ObjectID } = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
-const port = 5000;
+const port = 3000;
 //MongoDB connection string
-const connectionString = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority' //for dev
+const uri = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority' //for dev
 const { MongoClient } = require("mongodb");
 
-const uri = process.env.MONGODB_URI
+const connectionstring = process.env.MONGODB_URI
 // use the express-static middleware
 app.use(express.static("public"));
 
@@ -45,6 +45,10 @@ client.connect()
     app.get('/', (req, res) => { //When the main page loads, the esj file will render
         res.render('index.ejs')
     })
+
+    app.get('/login', (req, res) => { //When the main page loads, the esj file will render
+      res.render('login.ejs')
+  })
 
     app.post('/nodes', (req, res) => {
         nodeCollection.insertOne(req.body)
