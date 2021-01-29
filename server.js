@@ -7,6 +7,7 @@ const port = 3000;
 //MongoDB connection string
 const uri = 'mongodb+srv://clericmt:St4rw4rs@cluster0.rmuwu.mongodb.net/test?retryWrites=true&w=majority' //for dev
 const { MongoClient } = require("mongodb");
+const { json } = require('body-parser');
 
 const connectionstring = process.env.MONGODB_URI
 // use the express-static middleware
@@ -48,7 +49,16 @@ client.connect()
 
     app.get('/login', (req, res) => { //When the main page loads, the esj file will render
       res.render('login.ejs')
-  })
+    })
+
+    app.get('/users', (req, res) => { //when req sent from nodes, returns response
+      db.collection('users').find().toArray() //each object in db to an array
+        .then(results => {
+          res.send({ results }) //sends array to client as "nodes"
+        })
+
+        .catch(error => console.error(error))
+    })
 
     app.post('/nodes', (req, res) => {
         nodeCollection.insertOne(req.body)

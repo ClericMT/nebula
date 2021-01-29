@@ -10,7 +10,38 @@ html, body {
     
 }
 
+#user{
+    margin: auto;
+    padding: 2px;
+    font-size: 12px;
+    text-align: left;
+    background-color: #120d33;
+    border: 2px solid blue;
+    width: 200px;
+    height: 20px;
+}
 
+#password{
+    margin: auto;
+    padding: 2px;
+    font-size: 12px;
+    text-align: left;
+    background-color: #120d33;
+    border: 2px solid blue;
+    width: 200px;
+    height: 20px;
+}
+
+#create{
+    margin: auto;
+    padding: 2px;
+    font-size: 12px;
+    text-align: center;
+    background-color: #120d33;
+    border: 2px solid blue;
+    width: 200px;
+    height: 20px;
+}
 
 
 section {

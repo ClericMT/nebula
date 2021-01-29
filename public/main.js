@@ -36,9 +36,6 @@ let lastClick;
 let lastNode;
 let dragNode;
 
-
-
-
 //
 // CRUD
 //
