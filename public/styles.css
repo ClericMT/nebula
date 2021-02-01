@@ -1,0 +1,45 @@
+html, body {
+    background-color: black;  
+    font-family: monospace;
+    font-size: 16px;
+    color: aqua;
+}
+
+::placeholder {
+    color: aqua
+}
+
+.frm{
+    margin: auto;
+    padding: 2px;
+    font-size: 12px;
+    text-align: left;
+    background-color: #120d33;
+    border: 2px solid blue;
+    width: 200px;
+    height: 20px;
+    color: aqua;
+}
+
+.btn{
+    margin: auto;
+    padding: 2px;
+    font-size: 12px;
+    text-align: center;
+    background-color: #120d33;
+    border: 2px solid blue;
+    width: 210px;
+    height: 28px;
+    color: aqua;
+    font-family: monospace;
+}
+
+.canvas{
+    border: 2px solid blue;
+    position: absolute;
+}
+
+
+
+
+
