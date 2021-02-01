@@ -1,4 +1,5 @@
 import { nodes } from "/modules/logic.js"
+import { colours } from "/modules/styles.js"
 
 const canvasBg = document.getElementById('background-layer')
 const canvasNodes = document.getElementById('node-layer')
@@ -16,6 +17,7 @@ function fitToContainer(canvas){
 
 const drawNodes = () => {
     nodes.forEach(node => {
+        const colour = node.io ? node.colour = colours.active : node.colour = colours.idle
         drawCircle(node.x, node.y, 10, node.colour)
     })
 }

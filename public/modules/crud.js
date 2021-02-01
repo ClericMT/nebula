@@ -1,32 +1,39 @@
-let user = localStorage.getItem("user");
-let jsonUser = JSON.parse(user);
-const userName = jsonUser.name;
 
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+import { loadNodes } from "/modules/logic.js"
+
+let user;  
+
+const updateUser = (newUser) => {
+    user = newUser;
 }
 
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
+updateUser(JSON.parse(localStorage.getItem("user")))
+
+const createUser = (userName, userPass) => {
+    fetch('/users', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+            { 
+                name: user.name,
+                user_details : {
+                    username: userName,
+                    userpass: userPass
+                },  
+                user_data: {
+                    nodes: [],
+                    style: {},
+                    timestamps: []
+                
+                }
+            })
+    })
+    .then(next => {
+        window.location.replace("/login")
+    })  
 }
 
-const readUser = () => {
-    
+const read = () => { 
     fetch('/users', {
         method: 'get',
         headers: { 'Content-Type': 'application/json' },
@@ -36,15 +43,23 @@ const readUser = () => {
 
         })
         .then(data => {
-            for (let i = 0; i < data.users.length; i++){
-                if (data.users[i].user_details.username === jsonUser.name) {
-                        localStorage.setItem("user", JSON.stringify(data.users[i]));
-                        user = localStorage.getItem("user");
-                        jsonUser = JSON.parse(user);
-                        break; 
-                }
-            }
-        })  
+            findUserData(data)
+        }) 
+        .then(exc => {
+            loadNodes(user.nodes)
+        })
+        .catch(error => console.log(error))
+}
+
+const findUserData = (data) => {
+    for (let i = 0; i < data.users.length; i++){
+        if (data.users[i].user_details.username === user.name) {
+                localStorage.setItem("user", JSON.stringify(data.users[i]));
+                user = JSON.parse(localStorage.getItem("user"));
+                updateUser(user);
+                break; 
+        }
+    }
 }
 
 const loginUser = (userName, userPass) => {
@@ -69,7 +84,6 @@ const loginUser = (userName, userPass) => {
             }
         })  
 }
-
 
 const ifUserExists = (userName, userPass) => {
     fetch('/users', {
@@ -102,67 +116,26 @@ const ifUserExists = (userName, userPass) => {
         })  
 }
 
-const createUser = (userName, userPass) => {
-    fetch('/users', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(
-            { 
-                name: userName,
-                user_details : {
-                    username: userName,
-                    userpass: userPass
-                },  
-                user_data: {
-                    nodes: [],
-                    style: {},
-                    timestamps: []
-                
-                }
-            })
-    })
-    .then(next => {
-        window.location.replace("/login")
-    })  
-}
-
-const createNode = (node) => {
+function updateDBNodes(node) {
     fetch('/nodes', {
         method: 'post',
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify(
             {
-                username: userName,
-                id: node.id,
-                x: node.x,
-                y: node.y,
-                time: node.time,
-                name: node.name,
-                info: node.info,
-                text: node.text
+                username: user.name,
+                id: arguments[0],
+                name: arguments[1],
+                info: arguments[2],
+                x: arguments[3],
+                y: arguments[4],
+                io: arguments[5],
+                conns: arguments[6],
+                colour: arguments[7],
+                time: arguments[8],
+                timer: arguments[9],
+                startTimer: arguments[10]
             })
     })
-    .then(next => {
-        window.location.replace("/")
-    })
 }
 
-const updateData = (node) => {
-    fetch('/users', {
-        method: 'put',
-        headers: { 'Content-Type': 'application/json' }, //tells server this is a json file
-        body: JSON.stringify({
-            id: node.id,
-            x: node.x,
-            y: node.y,
-            time: node.time,
-            name: node.name,
-            text: node.text
-        })
-        .then(res => {
-        if (res.ok) return res.json()
-    })
-    })
-}
-
-export { loginUser, jsonUser as user, createUser, ifUserExists, createNode, readUser }
+export { loginUser, user, createUser, ifUserExists, updateDBNodes, read }

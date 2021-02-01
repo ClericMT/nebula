@@ -75,12 +75,16 @@ client.connect()
               nodes:
                 {
                   id: req.body.id,
-                  x: req.body.x,
-                  y: req.body.y,
-                  time: req.body.time,
                   name: req.body.name,
                   info: req.body.info,
-                  text: req.body.text
+                  x: req.body.x,
+                  y: req.body.y,
+                  io: req.body.io,
+                  conns: req.body.conns,
+                  colour: req.body.colour,
+                  time: req.body.time,
+                  timer: req.body.timer,
+                  startTimer: req.body.startTimer
                 } 
             }
           },
