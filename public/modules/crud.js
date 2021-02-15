@@ -1,4 +1,3 @@
-
 import { loadNodes } from "/modules/logic.js"
 
 let user;  
@@ -62,28 +61,6 @@ const findUserData = (data) => {
     }
 }
 
-const loginUser = (userName, userPass) => {
-    fetch('/users', {
-        method: 'get',
-        headers: { 'Content-Type': 'application/json' },
-    })  
-        .then(res => {
-            if (res.ok) return res.json()
-        })
-        .then(data => {
-            for (let i = 0; i < data.users.length; i++){
-                if (data.users[i].user_details.username === userName &&
-                    data.users[i].user_details.userpass === userPass){
-                        localStorage.setItem("user", JSON.stringify(data.users[i]));
-                        user = localStorage.getItem("user");
-                        window.location.replace("/"); 
-                        break; 
-                } else if (i === data.users.length - 1){
-                    {alert("User not found or incorrect password.");}
-                }
-            }
-        })  
-}
 
 const ifUserExists = (userName, userPass) => {
     fetch('/users', {
@@ -117,25 +94,52 @@ const ifUserExists = (userName, userPass) => {
 }
 
 function updateDBNodes(node) {
+    console.log(arguments[0].name)
     fetch('/nodes', {
         method: 'post',
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify(
             {
                 username: user.name,
-                id: arguments[0],
-                name: arguments[1],
-                info: arguments[2],
-                x: arguments[3],
-                y: arguments[4],
-                io: arguments[5],
-                conns: arguments[6],
-                colour: arguments[7],
-                time: arguments[8],
-                timer: arguments[9],
-                startTimer: arguments[10]
+                id: node.id,
+                name: node.name,
+                info: node.info,
+                x: node.x,
+                y: node.y,
+                io: node.io,
+                conns: node.conns,
+                colour: node.colour,
+                time: node.time,
+                timer: node.timer,
+                startTimer: node.startTimer
             })
     })
 }
 
-export { loginUser, user, createUser, ifUserExists, updateDBNodes, read }
+function updateDBNodeTime(node){
+    console.log(node.id)
+    fetch('/time', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(
+            {
+                username: user.name,
+                id: node.id,
+                time: node.time
+            })
+    })
+}
+
+function deleteDBNode(node) {
+    fetch('/nodes', {
+        method: 'delete',
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(
+            {
+                username: user.name,
+                id: node.id
+            })
+    })
+}
+
+export { user, createUser, ifUserExists, updateDBNodes, read, deleteDBNode, updateDBNodeTime }

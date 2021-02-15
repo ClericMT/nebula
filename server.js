@@ -66,13 +66,13 @@ client.connect()
         .catch(error => console.error(error))
     })
 
-    //Save data
+    //Save data //Need to fix this. Not updating existing node just adds another one. Make a put.
     app.post('/nodes', (req, res) => {
         db.collection('users').updateOne(
           {name: req.body.username},
           {
             $push: {
-              nodes:
+              "nodes":
                 {
                   id: req.body.id,
                   name: req.body.name,
@@ -90,10 +90,25 @@ client.connect()
           },
           { upsert: true }
           )
-          .then(results => {
-            res.redirect("/")
-          })
           .catch(error => console.log(error))
+    })
+
+    app.post('/time', (req, res) => {
+      db.collection('users').updateOne(
+        {name: req.body.username, "nodes.id": req.body.id},
+        { $set: { "nodes.$.time": req.body.time } },
+        { upsert: true }
+        )
+        .catch(error => console.log(error))
+  })
+
+
+    app.delete('/nodes', (req, res) => {
+      db.collection("users").updateOne(
+        { name: req.body.username },
+        { $pull: { nodes: { id: req.body.id }}}
+        )
+        .catch(error => console.error(error))
     })
 
     app.listen(process.env.PORT || port, () => console.log(`Example app listening on port ${port}!`))

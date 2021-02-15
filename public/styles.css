@@ -39,6 +39,24 @@ html, body {
     position: absolute;
 }
 
+#node-layer{
+    z-index: 1;
+}
+
+#animation-layer{
+    z-index: 0;
+}
+
+.infobox{
+    position: absolute;
+    padding: 10px;
+    background-color: #120d33;
+    width: 130px;
+    font-size: 14px;
+    text-align: center;
+    border: 2px solid blue;
+}
+
 
 
 
