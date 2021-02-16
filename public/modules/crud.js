@@ -130,6 +130,21 @@ function updateDBNodeTime(node){
     })
 }
 
+function updateDBNodeBox(node){
+    console.log(node.id)
+    fetch('/infobox', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(
+            {
+                username: user.name,
+                id: node.id,
+                info: node.info,
+                name: node.name
+            })
+    })
+}
+
 function deleteDBNode(node) {
     fetch('/nodes', {
         method: 'delete',
@@ -142,4 +157,4 @@ function deleteDBNode(node) {
     })
 }
 
-export { user, createUser, ifUserExists, updateDBNodes, read, deleteDBNode, updateDBNodeTime }
+export { user, createUser, ifUserExists, updateDBNodes, read, deleteDBNode, updateDBNodeTime, updateDBNodeBox }

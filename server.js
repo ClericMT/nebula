@@ -66,7 +66,7 @@ client.connect()
         .catch(error => console.error(error))
     })
 
-    //Save data //Need to fix this. Not updating existing node just adds another one. Make a put.
+    //Save data 
     app.post('/nodes', (req, res) => {
         db.collection('users').updateOne(
           {name: req.body.username},
@@ -96,7 +96,18 @@ client.connect()
     app.post('/time', (req, res) => {
       db.collection('users').updateOne(
         {name: req.body.username, "nodes.id": req.body.id},
-        { $set: { "nodes.$.time": req.body.time } },
+        { $set: { "nodes.$.time": req.body.time, } },
+        { upsert: true }
+        )
+        .catch(error => console.log(error))
+  })
+
+    app.post('/infobox', (req, res) => {
+      db.collection('users').updateOne(
+        {name: req.body.username, "nodes.id": req.body.id},
+        { $set: { 
+          "nodes.$.info": req.body.info,
+          "nodes.$.name": req.body.name } },
         { upsert: true }
         )
         .catch(error => console.log(error))

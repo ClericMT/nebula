@@ -68,6 +68,7 @@ const selectNode = (x, y) => {
         console.log("id: ", node.id);
         console.log("length: ", nodes.length);
         node.io = ioSwitch(node);
+        console.log(node.io)
         node.io ? infoBox(node, true) : infoBox(node, false)
         drawNodes();
     }
@@ -108,14 +109,12 @@ const logTime = (node) => {
     node.timer = timerSwitch(node);
     if (node.timer === true){
         node.startTime = Date.now();
-        node.io = true;
         drawNodes();
         timerList.push({node: node, glow: 0, up: true});
         animateNode();
     } else {
         node.time += Date.now() - node.startTime;
         console.log(node.time);
-        node.io = false;
         timerList = [];
         nodes.forEach(node => {
             if (node.timer){
