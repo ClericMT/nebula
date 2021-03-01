@@ -63,6 +63,7 @@ class Node {
         this.dir = 1;
         this.nodeIns = {};
         this.parentNode = currentNode;
+        this.childNodes = [];
         this.clicked = false;
     }
 
@@ -87,10 +88,6 @@ class Node {
         ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
-
-        //text
-        ctx.font = "30px Arial";
-        ctx.fillText(this.name, 10, 50);
 
         //brings lines to background
         ctx.globalCompositeOperation='destination-over';
@@ -163,12 +160,45 @@ class Node {
             this.dir = +0.4;
         }
     }
+
+    enterNode(i) {
+        if (typeof this.childNodes !== undefined){
+            currentNode = nodes[i];
+            nodes = currentNode.childNodes;
+            console.log(currentNode.childNodes)
+
+        } else {
+            nodes = []; 
+            currentNode = nodes[i];
+            console.log(currentNode.childNodes)
+        }
+    }
 }
 
 
 //-------------------------------------------------------------------------------------------
 
+class GUI {
 
+    update() {
+        return;
+    }
+
+    display() {
+        ctx.font = "30px Arial";
+        ctx.fillText(currentNode.id, 10, 50);
+    }
+
+    back() {
+        nodes = []
+        currentNode = currentNode.parentNode;
+        currentNode.childNodes.forEach(node => {
+            nodes.push(node)
+        })
+    }
+}
+
+const gui = new GUI(5)
 
 //-------------------------------------------------------------------------------------------
 
@@ -182,6 +212,7 @@ function fitToContainer(canvas){
 
 function setup() {
     currentNode = new Node(0, 0, 0);
+
     fitToContainer(canvas);
     for (let i = 0; i < 20; i++){
         nodes.push(new Node(Math.random()*700, Math.random()*700));
@@ -191,13 +222,15 @@ function setup() {
         const i = parseInt(Math.random() * nodes.length);
         const key = nodes[i].id;
         node.nodeIns[key] = nodes[i];
+        currentNode.childNodes.push(node)
     })
-    console.log(nodes)
 }
 
 
 function draw() {
     ctx.clearRect(0, 0, 2000, 2000)
+    gui.update();
+    gui.display();
     for (let i = 0; i < nodes.length; i++){
         nodes[i].update();
         nodes[i].display();
@@ -253,16 +286,16 @@ canvas.onmousemove = (e) => {
 canvas.ondblclick = (e) => {
     //create first node
     if (nodes.length === 0) {
-        screen.dblclicked();
+        nodes.push(new Node(mouse.position.x, mouse.position.y));
+        return;
     }
 
     for (let i=0; i < nodes.length; i++){
         if (mouse.returnLocation(nodes[i])){
-            nodes[i].enterNode();
+            nodes[i].enterNode(i);
             break;
         } else if (i === nodes.length - 1) { 
             nodes.push(new Node(mouse.position.x, mouse.position.y));
-            console.log(nodes.length)
             break;
         }
     }
@@ -283,6 +316,8 @@ window.onkeydown = (e) => {
         case ("x"):
             screen.zoom(0);
             break;
+        case ("b"):
+            gui.back();
     }
 }
 
