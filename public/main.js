@@ -1,34 +1,57 @@
+// To Do
+// change for loop for returnLocation into returnLocation
+// 
+
+import { Vector } from "./vector.js"
+import { styles } from "./styles.js"
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+let currentNode;
 let nodes = []
 
-let mouse = {
-    x: 0,
-    y: 0,
-    returnLocation: function(n) {
-        if (this.x > (n.x - n.radius) && this.x < (n.x + n.radius) && this.y > n.y - n.radius && this.y < n.y + n.radius){
-            return true;
-        } else return false;  
-    },
-};
-
 let screen = {
-    clicked: function() {
-        return
-    },
+    clicked: false,
+    magnify: 1,
     drag: function() {
-        return
+        let magnitude = mouse.position.subNew(mouse.savePos);
+        magnitude.div(10);
+        nodes.forEach(node => {
+            node.position.add(magnitude);
+        })
     },
-    dblclicked: function() {
-        nodes.push(new Node(mouse.x, mouse.y))
+    zoom: function(io) {
+        //zoom in
+        if (io === 1) {
+            console.log(this.magnify)
+            this.magnify *= 2;
+            console.log(this.magnify)
+        }
+        //zoom out
+        else if (io === 0) {
+            this.magnify /= 2;
+        }
     }
 }
 
+let mouse = {
+    savePos: new Vector(0, 0, 0),
+    position: new Vector(0, 0, 0),
+    returnLocation: function(n) {
+        if (this.position.x > (n.position.x - n.radius) && this.position.x < (n.position.x + n.radius) && this.position.y > n.position.y - n.radius && this.position.y < n.position.y + n.radius){
+            return true;
+        } else return false;
+    },
+};
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+
 class Node {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        this.position = new Vector(x, y, 0)
         this.id = parseInt(Math.random()*1000000);
         this.style = styles[1];
         this.color = this.style.fillStyle;
@@ -38,38 +61,51 @@ class Node {
         this.time = 0;
         this.radius = 10;
         this.dir = 1;
-        this.parentNodes = [];
+        this.nodeIns = {};
+        this.parentNode = currentNode;
+        this.clicked = false;
     }
 
     update() {
         if (this.timer) {
             this.animate();
         }
-        this.radius = this.time/1000 + 10
+        this.radius = (this.time/1000 + 10) * screen.magnify;
     }
 
     display() {
-        //lines between nodes
-        if (typeof this.parentNodes !== "undefined"){
-            this.parentNodes.forEach(node => {
-                ctx.strokeStyle = this.style.lineStyle;
-                ctx.lineWidth = this.style.lineWidth;
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(node.x, node.y);
-                ctx.stroke();
-            })
-        }
+        //brings nodes to foreground
+        ctx.globalCompositeOperation='source-over';
 
+        //lines between nodes
         ctx.lineWidth = this.style.outlineWidth;
         ctx.strokeStyle = this.style.strokeStyle;
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.shadowColor = this.style.shadowColor;
         ctx.shadowBlur = this.shadowBlur;
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
+
+        //text
+        ctx.font = "30px Arial";
+        ctx.fillText(this.name, 10, 50);
+
+        //brings lines to background
+        ctx.globalCompositeOperation='destination-over';
+
+        if (typeof this.nodeIns !== "undefined"){
+            for (const property in this.nodeIns) {
+                const n = this.nodeIns[property]
+                ctx.strokeStyle = this.style.lineStyle;
+                ctx.lineWidth = this.style.lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(this.position.x, this.position.y);
+                ctx.lineTo(n.position.x, n.position.y);
+                ctx.stroke();
+            }
+        }
     }
 
     select() {
@@ -92,8 +128,8 @@ class Node {
     }
 
     drag() {
-        this.x = mouse.x;
-        this.y = mouse.y;
+        this.position.x = mouse.position.x;
+        this.position.y = mouse.position.y;
     }
 
     timerIO(io) {
@@ -127,33 +163,12 @@ class Node {
             this.dir = +0.4;
         }
     }
-
-    delete(i) {
-        //remove connections also
-        nodes.forEach(node => {
-            if (node.parentNodes.includes(nodes[i])){
-                let index = node.parentNodes.indexOf(nodes[i]);
-                console.log(index)
-                node.parentNodes.splice(index, index);
-            }
-        })
-        nodes.splice(i, i);
-    }
 }
 
-const styles = {
-    1: {
-        fillStyle: "blue",
-        strokeStyle: "black",
-        outlineWidth: 1,
-        lineWidth: 1.5,
-        lineStyle: "purple",
-        highlightStyle: "aqua",
-        selectStyle: "aqua",
-        shadowColor: "aqua",
-        shadowBlur: 0
-    }
-}
+
+//-------------------------------------------------------------------------------------------
+
+
 
 //-------------------------------------------------------------------------------------------
 
@@ -166,67 +181,89 @@ function fitToContainer(canvas){
 }
 
 function setup() {
+    currentNode = new Node(0, 0, 0);
     fitToContainer(canvas);
-
     for (let i = 0; i < 20; i++){
-        nodes.push(new Node(Math.random()*700, Math.random()*700))
+        nodes.push(new Node(Math.random()*700, Math.random()*700));
     }
 
     nodes.forEach(node => {
         const i = parseInt(Math.random() * nodes.length);
-        node.parentNodes.push(nodes[i]);
-    }) 
+        const key = nodes[i].id;
+        node.nodeIns[key] = nodes[i];
+    })
+    console.log(nodes)
 }
 
+
 function draw() {
-    ctx.clearRect(0, 0, 2000, 2000);
-
-    nodes.forEach(node => {
-        node.update();
-        node.display();
-    })
-
-    window.requestAnimationFrame(draw)
+    ctx.clearRect(0, 0, 2000, 2000)
+    for (let i = 0; i < nodes.length; i++){
+        nodes[i].update();
+        nodes[i].display();
+    }
+    requestAnimationFrame(draw)
 }
 
 //-------------------------------------------------------------------------------------------
 
 canvas.onmousedown = (e) => {
+    let rect = canvas.getBoundingClientRect();
+    mouse.savePos.x = e.pageX - rect.left;
+    mouse.savePos.y = e.pageY - rect.top
+
     let n = false;
 
-    nodes.forEach(node => {
-        if (mouse.returnLocation(node)){
-            node.select();
-            node.clicked = true;
-            n = node;
-        } else { screen.clicked() }
-    });
+    for (let i = 0; i < nodes.length; i++) {
+        if (mouse.returnLocation(nodes[i])){
+            nodes[i].select();
+            nodes[i].clicked = true;
+            n = nodes[i];
+            break;
+        } else if (i === nodes.length - 1) { 
+            screen.clicked = true;
+        }
+    }
 
     canvas.onmouseup = (e) => {
-        if (n.clicked) {n.clicked = false;}
+        if (n.clicked) { n.clicked = false }
+        if (screen.clicked) { screen.clicked = false }
     }
 }
 
 canvas.onmousemove = (e) => {
     let rect = canvas.getBoundingClientRect();
-    mouse.x = e.pageX - rect.left;
-    mouse.y = e.pageY - rect.top;
+    mouse.position.x = e.pageX - rect.left;
+    mouse.position.y = e.pageY - rect.top;
+    console.log(mouse.position.y)
 
-    nodes.forEach(node => {
-        node.clicked ? node.drag() : screen.drag();
-        (mouse.returnLocation(node) && !node.selected) ? node.highlight(true) : node.highlight(false)
-    });
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].clicked){
+            nodes[i].drag();
+        } else if (i === nodes.length - 1 && screen.clicked) { 
+            screen.drag();
+        }
+
+        (mouse.returnLocation(nodes[i]) && !nodes[i].selected) ? nodes[i].highlight(true) : nodes[i].highlight(false)
+
+    }
     
 }
 
 canvas.ondblclick = (e) => {
+    //create first node
+    if (nodes.length === 0) {
+        screen.dblclicked();
+    }
+
     for (let i=0; i < nodes.length; i++){
         if (mouse.returnLocation(nodes[i])){
-            nodes[i].timer ? nodes[i].timerIO(false) : nodes[i].timerIO(true);
+            nodes[i].enterNode();
             break;
         } else if (i === nodes.length - 1) { 
-            screen.dblclicked()
-            nodes[nodes.length].timerIO(false); //causes console error;
+            nodes.push(new Node(mouse.position.x, mouse.position.y));
+            console.log(nodes.length)
+            break;
         }
     }
 }
@@ -234,11 +271,18 @@ canvas.ondblclick = (e) => {
 window.onkeydown = (e) => {
     switch (e.key){
         case ("Delete"):
-            for (let i=0; i < nodes.length; i++){
+            for (let i=0; i < nodes.length; i++) {
                 if (nodes[i].selected){
                     nodes[i].delete(i);
+                }
             }
-        }
+            break;
+        case ("z"):
+            screen.zoom(1);
+            break;
+        case ("x"):
+            screen.zoom(0);
+            break;
     }
 }
 
